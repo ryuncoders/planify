@@ -2,6 +2,8 @@ import { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import TanStackProvider from "@/providers/TanStackProvider";
+import { useRecoilState } from "recoil";
+import { modeState } from "@/lib/atom";
 
 export const metadata: Metadata = {
   title: "Create Next App",
