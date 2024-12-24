@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  email    String @unique
+  password String
+  name     String
+  goal     goal[]
+
+  weeklyTask weeklyTask[]
+
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  Notification Notification[]
+}
+
+model goal {
+  id          Int        @id @default(autoincrement())
+  title       String
+  description String
+  startDate   DateTime
+  endDate     DateTime
+  progress    Float      @default(0)
+  status      String     @default("PLANNED")
+  user        User       @relation(fields: [userId], references: [id])
+  userId      Int
+  workItem    workItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model workItem {
+  id       Int        @id @default(autoincrement())
+  title    String
+  goal     goal       @relation(fields: [goalId], references: [id])
+  goalId   Int
+  timeLine TimeLine[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TimeLine {
+  id              Int      @id @default(autoincrement())
+  title           String
+  description     String
+  startDateNumber Int
+  endDateNumber   Int
+  workItem        workItem @relation(fields: [workItemId], references: [id])
+  workItemId      Int
+  task            task[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model task {
+  id            Int    @id @default(autoincrement())
+  text          String
+  estimatedTime Int
+  actualTime    Int
+  status        String @default("PENDING")
+
+  startTime DateTime? // 작업 시작 시간
+  endTime   DateTime? // 작업 종료 시간
+
+  TimeLine   TimeLine? @relation(fields: [timeLineId], references: [id])
+  timeLineId Int?
+  completed  Boolean   @default(false)
+  date       DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model weeklyTask {
+  id            Int       @id @default(autoincrement())
+  text          String
+  estimatedTime Int
+  actualTime    Int
+  user          User      @relation(fields: [userId], references: [id])
+  userId        Int
+  completed     Boolean   @default(false)
+  date          DateTime
+  startTime     DateTime? // 작업 시작 시간
+  endTime       DateTime? // 작업 종료 시간
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Notification {
+  id     Int      @id @default(autoincrement())
+  text   String
+  user   User     @relation(fields: [userId], references: [id])
+  userId Int
+  isRead Boolean  @default(false)
+  date   DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
